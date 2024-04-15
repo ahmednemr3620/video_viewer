@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:helpers/helpers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -44,8 +45,8 @@ class _VideoViewerCoreState extends State<VideoViewerCore> {
   Axis _dragDirection = Axis.vertical;
   int _rewindDoubleTapCount = 0;
   int _forwardDoubleTapCount = 0;
-  int _defaultRewindAmount = -10;
-  int _defaultForwardAmount = 10;
+  int _defaultRewindAmount = -50;
+  int _defaultForwardAmount = 50;
   Timer? _rewindDoubleTapTimer;
   Timer? _forwardDoubleTapTimer;
   bool _showForwardStatus = false;
@@ -343,8 +344,22 @@ class _VideoViewerCoreState extends State<VideoViewerCore> {
         forwardSeconds: _defaultForwardAmount * _forwardDoubleTapCount,
       ),
       VideoCoreForwardAndRewindLayout(
-        rewind: GestureDetector(onDoubleTap: _rewind),
-        forward: GestureDetector(onDoubleTap: _forward),
+        rewind: Focus(
+            onKey: (node, event) {
+              if (event.isKeyPressed(LogicalKeyboardKey.arrowLeft)) {
+                _rewind();
+              }
+              return KeyEventResult.ignored;
+            },
+            child: GestureDetector(onDoubleTap: _rewind)),
+        forward: Focus(
+            onKey: (node, event) {
+              if (event.isKeyPressed(LogicalKeyboardKey.arrowRight)) {
+                _forward();
+              }
+              return KeyEventResult.ignored;
+            },
+            child: GestureDetector(onDoubleTap: _forward)),
       ),
       Builder(builder: (_) {
         final controller = _query.video(context, listen: true);
